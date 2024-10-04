@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-data=pd.read_csv("D:\\AI_track\\fifa_eda.csv")
+data=pd.read_csv("fifa_eda.csv")
 st.sidebar.image("https://play-lh.googleusercontent.com/NcrdWFjmF2GPRlif4xC-9WM4bQXxHjU4yuWVQjsdDh7xtKPc6nVSRhp-iOlFnpuepg")
 st.sidebar.html(" <h4 style='text-align: center; color: #A9A9A9; font-style: italic;'>For the Game.For the World.</h4>")
 st.sidebar.header("",divider='rainbow')
