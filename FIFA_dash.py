@@ -63,7 +63,19 @@ with col22:
 st.divider()
 
 
-st.header('The proportion of the positions')
-st.plotly_chart(px.pie(names=data['Position']))
+st.header('The Proportion of the positions')
+count_pos=data.groupby('Position').size()
+fig = px.bar_polar(r=count_pos.values, theta=count_pos.index, 
+                   color=count_pos.index,  
+                   title="Count by Position", 
+                   template="plotly_dark", 
+                   )  
 
+# Hide the radial grid and circular axis
+fig.update_polars(
+    radialaxis_showline=False,  
+    radialaxis_ticks='',        
+    radialaxis_showticklabels=False  
+)
+st.plotly_chart(fig)
 
