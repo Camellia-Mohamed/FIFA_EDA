@@ -4,7 +4,7 @@ import plotly.express as px
 
 # Load data
 data = pd.read_csv("fifa_eda.csv")
-st.write(data)
+
 # Sidebar Content
 st.sidebar.image("https://play-lh.googleusercontent.com/NcrdWFjmF2GPRlif4xC-9WM4bQXxHjU4yuWVQjsdDh7xtKPc6nVSRhp-iOlFnpuepg")
 st.sidebar.markdown("<h4 style='text-align: center; color: #A9A9A9; font-style: italic;'>For the Game. For the World.</h4>", unsafe_allow_html=True)
