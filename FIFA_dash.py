@@ -84,9 +84,9 @@ st.header('The Proportion of the Positions')
 count_pos = data.groupby('Position').size()
 
 # Polar Bar Chart
-fig = px.bar_polar(
-    r=count_pos.values, 
-    theta=count_pos.index, 
+fig = px.bar(
+    x=count_pos.values, 
+    y=count_pos.index, 
     color=count_pos.index,  
     title="Count of Each Position", 
     template="plotly_dark", 
