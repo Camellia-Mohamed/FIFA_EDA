@@ -20,7 +20,18 @@ select_nations = st.multiselect('Select Country:', data['Nationality'].unique())
 nations = data['Nationality'].value_counts().reset_index()
 nations.columns = ['Nationality', 'Player Count']
 
+# Filter by selected nations
+selected_data = nations if not select_nations else nations[nations['Nationality'].isin(select_nations)]
 
+# Choropleth Map
+st.plotly_chart(px.choropleth(
+    selected_data,
+    locations='Nationality',
+    locationmode='country names',
+    color='Player Count',
+    color_continuous_scale=px.colors.sequential.Greens
+))
+st.divider()
 
 # Top 10 Players Section
 st.header('Top 10 Players According to')
