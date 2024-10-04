@@ -24,7 +24,7 @@ nations.columns = ['Nationality', 'Player Count']
 selected_data = nations if not select_nations else nations[nations['Nationality'].isin(select_nations)]
 
 # Choropleth Map
-st.plotly_chart(px.choropleth(
+st.plotly_chart(px.scatter_geo(
     selected_data,
     locations='Nationality',
     locationmode='country names',
