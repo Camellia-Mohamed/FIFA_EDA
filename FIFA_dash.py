@@ -85,8 +85,8 @@ count_pos = data.groupby('Position').size()
 
 # Polar Bar Chart
 fig = px.bar(
-    x=count_pos.values, 
-    y=count_pos.index, 
+    y=count_pos.values, 
+    x=count_pos.index, 
     color=count_pos.index,  
     title="Count of Each Position", 
     template="plotly_dark", 
