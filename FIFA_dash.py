@@ -67,8 +67,9 @@ st.header('The Proportion of the positions')
 count_pos=data.groupby('Position').size()
 fig = px.bar_polar(r=count_pos.values, theta=count_pos.index, 
                    color=count_pos.index,  
-                   title="Count by Position", 
+                   title="Count of each Position", 
                    template="plotly_dark", 
+                   labels={'color':'Positions'}
                    )  
 
 # Hide the radial grid and circular axis
