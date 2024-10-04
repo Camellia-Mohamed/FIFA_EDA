@@ -38,38 +38,40 @@ st.header('Top 10 Players According to')
 top_per = st.selectbox('Select Value', options=['Value', 'Overall', 'Wage', 'Release Clause', 'Potential'])
 
 # Create tabs for diagram and table
-tab1, tab2 = st.tabs(['Diagram', 'Table'])
+diagram, table = st.tabs(['Diagram', 'Table'])
 top_table = data.sort_values(top_per, ascending=False)[['Name', top_per]].head(10)
 
-with tab1:
+with diagram:
     st.plotly_chart(px.bar(top_table, x='Name', y=top_per, color='Name'))
 
-with tab2:
+with table:
     st.dataframe(top_table.set_index('Name'))
 
 st.divider()
 
 # Scatter Plots Section
-col1, col2 = st.columns(2)
+Value_per_Nation_chart, Value_per_Club_chart = st.columns(2)
 
-with col1:
+with Value_per_Nation_chart:
     st.header('The Value per Nation')
-    st.plotly_chart(px.scatter(data, x='Nationality', y='Value'))
+    nation_value = data.groupby('Nationality')['Value'].mean().reset_index()
+    st.plotly_chart(px.scatter(nation_value, x='Nationality', y='Value'))
 
-with col2:
+with Value_per_Club_chart:
     st.header('The Value per Club')
-    st.plotly_chart(px.scatter(data, x='Club', y='Value', height=500))
+    club_value = data.groupby('Club')['Value'].mean().reset_index()
+    st.plotly_chart(px.bar(club_value, x='Club', y='Value'))
 
 st.divider()
 
 # Preferred Foot Section
-col11, col22 = st.columns(2)
+Leg_percentage_chart, Effect_of_legs_chart = st.columns(2)
 
-with col11:
+with Leg_percentage_chart:
     st.header('Percentage of Preferred Leg')
     st.plotly_chart(px.pie(names=data['Preferred Foot'], color_discrete_sequence=['#0F67B1', '#EDE8DC']))
 
-with col22:
+with Effect_of_legs_chart:
     st.header('Effect of the Leg on')
     effect = st.radio('Select Value', ['Skill Moves', 'Potential'], horizontal=True)
     foot_skill = data.groupby(['Preferred Foot', effect]).size().unstack()
