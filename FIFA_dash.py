@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 
 # Load data
 data = pd.read_csv("fifa_eda.csv")
@@ -23,13 +24,32 @@ nations.columns = ['Nationality', 'Player Count']
 # Filter by selected nations
 selected_data = nations if not select_nations else nations[nations['Nationality'].isin(select_nations)]
 
+#label data
+mean_value_of_Players = data.groupby('Nationality')['Value'].mean()
+mean_overall = data.groupby('Nationality')['Overall'].mean()
+mean_wage = data.groupby('Nationality')['Wage'].mean()
+mean_clause = data.groupby('Nationality')['Release Clause'].mean()
+
+# Merge the calculated means with the selected data
+selected_data = selected_data.merge(mean_value_of_Players, on='Nationality', how='left',suffixes=('', '_mean'))
+selected_data = selected_data.merge(mean_overall, on='Nationality', how='left', suffixes=('', '_mean'))
+selected_data = selected_data.merge(mean_wage, on='Nationality', how='left', suffixes=('', '_mean'))
+selected_data = selected_data.merge(mean_clause, on='Nationality', how='left', suffixes=('', '_mean'))
 # Choropleth Map
 st.plotly_chart(px.choropleth(
     selected_data,
     locations='Nationality',
     locationmode='country names',
     color='Player Count',
-    color_continuous_scale=px.colors.sequential.Greens
+    hover_data={
+        'Nationality': True,
+        'Player Count':True,
+        'Value':':.2f',
+        'Overall':':.2f',
+        'Wage':':.2f',
+        'Release Clause':':.2f'
+    },
+    color_continuous_scale=['#FCDE70','green']
 ))
 st.divider()
 
@@ -49,20 +69,6 @@ with table:
 
 st.divider()
 
-# Scatter Plots Section
-Value_per_Nation_chart, Value_per_Club_chart = st.columns(2)
-
-with Value_per_Nation_chart:
-    st.header('The Value per Nation')
-    nation_value = data.groupby('Nationality')['Value'].mean().reset_index()
-    st.plotly_chart(px.scatter(nation_value, x='Nationality', y='Value'))
-
-with Value_per_Club_chart:
-    st.header('The Value per Club')
-    club_value = data.groupby('Club')['Value'].mean().reset_index()
-    st.plotly_chart(px.bar(club_value, x='Club', y='Value'))
-
-st.divider()
 
 # Preferred Foot Section
 Leg_percentage_chart, Effect_of_legs_chart = st.columns(2)
@@ -74,30 +80,57 @@ with Leg_percentage_chart:
 with Effect_of_legs_chart:
     st.header('Effect of the Leg on')
     effect = st.radio('Select Value', ['Skill Moves', 'Potential'], horizontal=True)
-    foot_skill = data.groupby(['Preferred Foot', effect]).size().unstack()
-    st.plotly_chart(px.bar(foot_skill, labels={effect: effect, 'Preferred Foot': 'Preferred Foot', 'value': 'Count'}, barmode='group'))
+    if effect=='Skill Moves':
+        foot_skill = data.groupby(['Preferred Foot'])[effect].mean().reset_index()
+        st.plotly_chart(
+            px.bar(
+                foot_skill,
+                x='Preferred Foot', 
+                y=effect,
+                labels={effect: f'Mean {effect}', 'Preferred Foot': 'Preferred Foot'},
+                title=f'Average {effect} by Preferred Foot',
+                color='Preferred Foot',
+                color_discrete_sequence=['#EDE8DC','#0F67B1' ]
+            )
+        )
+    else:
+        left_leg=data[data['Preferred Foot']=='Left']
+        right_leg=data[data['Preferred Foot']=='Right']
+        # Create a figure
+        fig = go.Figure()
+
+
+        # Add the first histogram
+        fig.add_trace(go.Histogram(
+            x=right_leg['Potential'],
+            name='Right leg',
+            opacity=0.75,
+            marker=dict(color='#0F67B1'),
+            nbinsx=30  # Number of bins for the second histogram
+        ))
+
+        # Add the second histogram
+        fig.add_trace(go.Histogram(
+            x=left_leg['Potential'],
+            name='left Leg',
+            opacity=0.90,  # Adjust opacity to see overlap
+            marker=dict(color='#EDE8DC'),
+            nbinsx=30, # Number of bins for the first histogram
+        ))
+
+        
+       
+
+        # Update layout
+        fig.update_layout(
+            title='Two Histograms in One Figure',
+            xaxis_title='Value',
+            yaxis_title='Count',
+            barmode='overlay'  # Overlay the bars for comparison
+        )
+        st.plotly_chart(fig)
+
+
 
 st.divider()
 
-# Position Distribution Section
-st.header('The Proportion of the Positions')
-count_pos = data.groupby('Position').size()
-
-# Polar Bar Chart
-fig = px.bar(
-    y=count_pos.values, 
-    x=count_pos.index, 
-    color=count_pos.index,  
-    title="Count of Each Position", 
-    template="plotly_dark", 
-    labels={'color': 'Positions'}
-)
-
-# Customize layout of polar chart
-fig.update_polars(
-    radialaxis_showline=False,  
-    radialaxis_ticks='',        
-    radialaxis_showticklabels=False
-)
-
-st.plotly_chart(fig)
